@@ -213,7 +213,7 @@ def async_sending_message_broadcast(data):
 
             for key,message in content.items():
                 print(message)
-                utils.msg_types[message["type"].lower()](user["id"], message["content"],page_data["pageAccessToken"])
+                utils.msg_types[message["type"].lower()](user["id"], message["content"],page_data["pageAccessToken"],"MESSAGE_TAG","CONFIRMED_EVENT_UPDATE")
                 utils.socketio.emit('recived_message_from_facebook', {
                     "text": message["content"], "id": user["id"], "me": True, "type": message["type"].lower()}, broadcast=True,
                     room=page_data["pageInfo"]["pageId"])
