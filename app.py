@@ -220,6 +220,7 @@ def async_sending_message_broadcast(data):
 
 @utils.socketio.on('broadcasting_filtered')
 def sending_to_multi_facebook_filtered(data):
+    print("i am in broad casting ***************************-----------------")
     utils.socketio.start_background_task(async_sending_message_broadcast,data)
                 
 
