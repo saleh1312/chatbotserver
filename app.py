@@ -7,6 +7,7 @@ import time
 from database.database import ChatbotDatabase
 from datetime import datetime
 import pytz
+import uuid
 
 
 app = Flask(__name__)
@@ -223,6 +224,45 @@ def sending_to_multi_facebook_filtered(data):
     utils.socketio.start_background_task(async_sending_message_broadcast,data)
                 
 
+
+############################################ website functions
+
+
+@app.route("/generate_id", methods=['GET'])
+def generate_id():
+    data = request.get_json(force=True)
+    pageid=data['page_id']
+    ide=str(uuid.uuid4())
+    # here we need to add the user to page id website users with
+    return ide, 200
+
+@app.route("/get_msgs", methods=['GET'])
+def message_from_website(data):
+    data = request.get_json(force=True)
+    pageid=data['page_id']
+    userid=data['user_id']
+    #here we need to retrive all messages from page.user server
+
+@utils.socketio.on('message_from_website')
+def message_from_website(data):
+    message=data["message"]
+    page_id=data["page_id"]
+    user_id=data["user_id"]
+    utils.socketio.emit('recived_message_from_facebook', {
+                    "text": message["content"], "id": user_id, "me": False, "type": "text","platform":"website"}, broadcast=True,
+                    room=page_id)
+    #here we need to store messages in page.user database
+
+@utils.socketio.on('message_to_website')
+def message_to_website(data):
+    message=data["message"]
+    page_id=data["page_id"]
+    user_id=data["user_id"]
+    utils.socketio.emit('message_to_website', {
+                    "text": message["content"], "id": user_id, "me": False, "type": "text","platform":"website"}, broadcast=True,
+                    room=page_id)
+    #here we need to store messages in page.user database
+#############################################
 
 def test(ff):
     time.sleep(10)
