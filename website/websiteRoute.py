@@ -1,6 +1,6 @@
 
 from flask import Blueprint, request, jsonify
-from utils.utils import handlemessage, get_current_user, chatbot_db
+from utils.utils import handlemessage, get_current_user, chatbot_db,socketio
 from website.websiteApi import WebsiteAPI
 import uuid
 
@@ -40,6 +40,7 @@ def websiteWebhook():
     sender_id = None
     print(data['message'])
     print(data['sid'])
+    print(data['userid'])
     print('*****************')
     
     my_flows, my_arrows, my_users, userID = get_current_flow(data['sid'])
@@ -49,6 +50,9 @@ def websiteWebhook():
         # Read messages from facebook messanger.
         message = data['message']
         print(sender_id)
+        socketio.emit('recived_message_from_facebook', {
+                    "text": data['message'], "id": data['userid'], "me": False, "type": "text"}, broadcast=True,
+                    room=data['sid'])
 
         # current_user, entered_cards, user_index = get_current_user(sender_id)
 

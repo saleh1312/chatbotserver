@@ -7,6 +7,7 @@ import time
 from database.database import ChatbotDatabase
 from datetime import datetime
 import pytz
+import uuid
 
 
 app = Flask(__name__)
@@ -67,6 +68,7 @@ welcome_messages = ["start", "hi", "hello",
 #     return "Facebook", 200
 
 
+
 @app.route("/instagram", methods=['GET'])
 def instagramVerify():
     return "Hello Instagram", 200
@@ -75,6 +77,10 @@ def instagramVerify():
 def instaWebhook():
     return "Instagram", 200
 
+
+@app.route("/website", methods=['POST'])
+def websiteWebhook():
+    return "website", 200
 
 @app.route("/website", methods=['POST'])
 def websiteWebhook():
