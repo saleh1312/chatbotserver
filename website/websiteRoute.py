@@ -50,7 +50,7 @@ def websiteWebhook():
         # Read messages from facebook messanger.
         message = data['message']
         print(sender_id)
-        socketio.emit('recived_message_from_facebook', {
+        socketio.emit('recived_message_from_website', {
                     "text": data['message'], "id": data['userid'], "me": False, "type": "text"}, broadcast=True,
                     room=data['sid'])
 
