@@ -41,25 +41,18 @@ def instagramVerify():
 
 @instaRoute.route("/instagram", methods=['POST'])
 def instaWebhook():
-    print('*************************')
-    print('*************************')
-    print('*************************')
     global instagram_chatbot
     global final_map
     global savedIndx
     global savedDestID
     global chatbot_db
-    print('*************************')
-    print('*************************')
-    print('*************************')
-    print('*************************')
-    print('*************************')
     data = request.get_json()
-    print(data)
-    print(data['entry'][0]['messaging'][0]['recipient']['id'])
     pageId = data['entry'][0]['messaging'][0]['recipient']['id']
-    my_flows, my_arrows, my_users, userID = get_current_flow(pageId)
+    my_flows, my_arrows, my_users, userID, access_token = get_current_flow(pageId)
+    api = "https://graph.facebook.com/v15.0/me/messages?access_token=" + access_token
+    instagram_chatbot = InstagramAPI(api)
     final_map = chatbot_db.flows_preparation(my_flows)
+    print('*************************')
 
     try:
         # Read messages from facebook messanger.
@@ -122,24 +115,28 @@ def instaWebhook():
                     })
 
                 if (len(replies) != 0):
-                    instagram_chatbot.send_type_action(sender_id)
+                    print("EH EH EHE EHEH")
+                    # instagram_chatbot.send_type_action(sender_id)
+                    print("EH EH EHE EHEH")
                     response = instagram_chatbot.message_with_buttons(
                         sender_id, final_map['box_1']['content'][0]['content_text'], replies)
-                    handlemessage(
-                        sender_id, {'text': message['text'], 'type': 'text'}, False)
-                    handlemessage(sender_id, {'text': {
-                                  'title': final_map['box_1']['content'][0]['content_text'], 'buttons': replies}, 'type': 'card'}, True)
-
+                    print("EH EH EHE EHEH")
+                    # handlemessage(
+                    #     sender_id, {'text': message['text'], 'type': 'text'}, False)
+                    # handlemessage(sender_id, {'text': {
+                    #               'title': final_map['box_1']['content'][0]['content_text'], 'buttons': replies}, 'type': 'card'}, True)
+                    print(response)
+                    return response
                 else:
                     instagram_chatbot.send_type_action(sender_id)
                     response = instagram_chatbot.message_with_buttons(
                         sender_id, final_map['box_1']['content'][0]['content_text'], [])
-                    handlemessage(
-                        sender_id, {'text': message['text'], 'type': 'text'}, False)
-                    handlemessage(sender_id, {
-                                  'text': final_map['box_1']['content'][0]['content_text'], 'type': 'text'}, True)
+                    # handlemessage(
+                    #     sender_id, {'text': message['text'], 'type': 'text'}, False)
+                    # handlemessage(sender_id, {
+                    #               'text': final_map['box_1']['content'][0]['content_text'], 'type': 'text'}, True)
 
-                return response
+                    return response
 
         if message != None:
             if message['text'] == "انهاء":
@@ -495,4 +492,4 @@ def get_current_flow(recip_id):
     my_admins = chatbot_db.getAllAdmins()
     for admin in my_admins:
         if admin['myInstagramId'] == recip_id:
-            return admin['myFlow'], admin['myArrows'], admin['myUsers'], admin['userID']
+            return admin['myFlow'], admin['myArrows'], admin['myUsers'], admin['userID'], admin['pageAccessToken']

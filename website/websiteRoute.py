@@ -2,6 +2,7 @@
 from flask import Blueprint, request, jsonify
 from utils.utils import handlemessage, get_current_user, chatbot_db
 from website.websiteApi import WebsiteAPI
+import uuid
 
 webRoute = Blueprint("webRoute", __name__, template_folder="templates")
 
@@ -36,15 +37,18 @@ def websiteWebhook():
     global savedDestID
     global chatbot_db
     data = request.get_json()
+    sender_id = None
     print(data['message'])
+    print(data['sid'])
     print('*****************')
-    my_flows, my_arrows, my_users, userID = get_current_flow("123abc123")
+    
+    my_flows, my_arrows, my_users, userID = get_current_flow(data['sid'])
     final_map = chatbot_db.flows_preparation(my_flows)
 
     try:
         # Read messages from facebook messanger.
         message = data['message']
-        sender_id = "user123456"
+        print(sender_id)
 
         # current_user, entered_cards, user_index = get_current_user(sender_id)
 
@@ -454,8 +458,20 @@ def websiteWebhook():
     except:
         return "NOT WORKING!"
 
+@webRoute.route("/generateId", methods=['POST'])
+def generateUserId():
+    ide= str(uuid.uuid4())
+    resp = jsonify({"id": ide})
+    print(ide)
+    # resp.headers.add('Access-Control-Allow-Origin', '*')
+    return resp
+    
+
+
 def get_current_flow(recip_id):
     my_admins = chatbot_db.getAllAdmins()
     for admin in my_admins:
         if admin['myWebsiteId'] == recip_id:
             return admin['myFlow'], admin['myArrows'], admin['myUsers'], admin['userID']
+        else:
+            return "Not connected", "Not connected","Not connected", "Not connected"

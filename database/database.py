@@ -79,6 +79,9 @@ class ChatbotDatabase():
                 'myInstagramId': admin['myInstagramId'],
                 'instagramInfo': admin['instagramInfo'],
                 'phoneNumber': admin['phoneNumber'],
+                'emailInfo': admin['emailInfo'],
+                'myWebsiteId': admin['myWebsiteId'],
+                'websiteInfo': admin['websiteInfo'],
                 }
             })
         print('UPDATED SUCCESSFULLY')   

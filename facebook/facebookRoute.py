@@ -53,6 +53,8 @@ def fbwebhook():
     global chatbot_db
     data = request.get_json()
     pageId = data['entry'][0]['messaging'][0]['recipient']['id']
+    print(pageId)
+    print("************************")
     my_flows, my_arrows, my_users, userID, pageAccessToken = get_current_flow(pageId)
     api = "https://graph.facebook.com/v14.0/me/messages?access_token=" + pageAccessToken
     facebook_chatbot = FacebookAPI(api)
@@ -284,9 +286,10 @@ def fbwebhook():
 
             destination_id = None
             
-            
+            print("**************************")
             
             if buttonID != None:
+                print("AH AHA HAHA AHAHA")
                 for arrow in my_arrows:
                     if arrow['start'] == buttonID:
                         destination_id = arrow['end']
@@ -303,6 +306,7 @@ def fbwebhook():
                 chatbot_db.updateAdminUsers(my_users, userID)
 
                 if (len(contentList) > 1):
+                    print("TMAM TMAM ASASDAS SADFSAD SA")
                     replies = []
                     for cont in contentList:
                         replies.append({
@@ -551,5 +555,5 @@ def fbwebhook():
 def get_current_flow(recip_id):
     my_admins = chatbot_db.getAllAdmins()
     for admin in my_admins:
-        if admin['myPageId'] == recip_id:
+        if admin['pageInfo']['pageId'] == recip_id:
             return admin['myFlow'], admin['myArrows'], admin['myUsers'], admin['userID'], admin['pageAccessToken']

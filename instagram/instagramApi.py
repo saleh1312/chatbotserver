@@ -31,6 +31,7 @@ class InstagramAPI():
                 "quick_replies": buttons
             }
         }
+        print(buttons)
 
         resp = requests.post(self.API, json=request_body).json()
         return resp

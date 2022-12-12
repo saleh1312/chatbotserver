@@ -7,7 +7,6 @@ import time
 from database.database import ChatbotDatabase
 from datetime import datetime
 import pytz
-import uuid
 
 
 app = Flask(__name__)
@@ -26,6 +25,7 @@ from website.websiteRoute import webRoute
 from website.websiteApi import WebsiteAPI
 from facebook.facebookApi import FacebookAPI
 from instagram.instagramApi import InstagramAPI
+from emails.emailApi import EmailAPI
 from config import PAGE_ACCESS_TOKEN
 
 
@@ -40,6 +40,7 @@ API = "https://graph.facebook.com/v14.0/me/messages?access_token="+PAGE_ACCESS_T
 facebook_chatbot = FacebookAPI(API)
 instagram_chatbot = InstagramAPI(API)
 web_chatbot = WebsiteAPI()
+email_chatbot = EmailAPI()
 #
 savedDestID = None
 savedIndx = None
@@ -146,6 +147,23 @@ def update_admin_flow():
     return resp
 
 
+@app.route("/send_email", methods=['POST'])
+def send_email():
+    sender_email = request.get_json(force=True)['sender_email']
+    reciever_email = request.get_json(force=True)['reciever_email']
+    password = request.get_json(force=True)['password']
+    email_subject = request.get_json(force=True)['email_subject']
+    email_msg = request.get_json(force=True)['email_msg']
+    msg_attach = request.get_json(force=True)['msg_attach']
+
+    print("RECIVED")
+
+    email_chatbot.send_mail(sender_email, reciever_email, password, email_subject, email_msg, msg_attach)
+
+    resp = jsonify({"Res": "Email Sent Successfully"})
+    resp.headers.add('Access-Control-Allow-Origin', '*')
+    return resp
+
 @utils.socketio.on('connect')
 def test_connect(client):
     foo = request.args.get('foo')
@@ -214,56 +232,16 @@ def async_sending_message_broadcast(data):
 
             for key,message in content.items():
                 print(message)
-                utils.msg_types[message["type"].lower()](user["id"], message["content"],page_data["pageAccessToken"],"MESSAGE_TAG","CONFIRMED_EVENT_UPDATE")
+                utils.msg_types[message["type"].lower()](user["id"], message["content"],page_data["pageAccessToken"])
                 utils.socketio.emit('recived_message_from_facebook', {
                     "text": message["content"], "id": user["id"], "me": True, "type": message["type"].lower()}, broadcast=True,
                     room=page_data["pageInfo"]["pageId"])
 
 @utils.socketio.on('broadcasting_filtered')
 def sending_to_multi_facebook_filtered(data):
-    print("i am in broad casting ***************************-----------------")
     utils.socketio.start_background_task(async_sending_message_broadcast,data)
                 
 
-
-############################################ website functions
-
-
-@app.route("/generate_id", methods=['GET'])
-def generate_id():
-    data = request.get_json(force=True)
-    pageid=data['page_id']
-    ide=str(uuid.uuid4())
-    # here we need to add the user to page id website users with
-    return ide, 200
-
-@app.route("/get_msgs", methods=['GET'])
-def message_from_website(data):
-    data = request.get_json(force=True)
-    pageid=data['page_id']
-    userid=data['user_id']
-    #here we need to retrive all messages from page.user server
-
-@utils.socketio.on('message_from_website')
-def message_from_website(data):
-    message=data["message"]
-    page_id=data["page_id"]
-    user_id=data["user_id"]
-    utils.socketio.emit('recived_message_from_facebook', {
-                    "text": message["content"], "id": user_id, "me": False, "type": "text","platform":"website"}, broadcast=True,
-                    room=page_id)
-    #here we need to store messages in page.user database
-
-@utils.socketio.on('message_to_website')
-def message_to_website(data):
-    message=data["message"]
-    page_id=data["page_id"]
-    user_id=data["user_id"]
-    utils.socketio.emit('message_to_website', {
-                    "text": message["content"], "id": user_id, "me": False, "type": "text","platform":"website"}, broadcast=True,
-                    room=page_id)
-    #here we need to store messages in page.user database
-#############################################
 
 def test(ff):
     time.sleep(10)
@@ -278,7 +256,7 @@ def instagramVerifyfre():
     
 
 if __name__ == "__main__":
-    app.run(port=3030, debug=True, threaded=True)
+    #app.run(port=3030, debug=True, threaded=True)
     # utils.socketio.run(app, port=5004)
-    #utils.socketio.run(app, port=8080, allow_unsafe_werkzeug=True,debug=True)
-    # app.run()
+    utils.socketio.run(app, port=8080, allow_unsafe_werkzeug=True,debug=True)
+    app.run()

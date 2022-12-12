@@ -5,21 +5,13 @@ socketio = None
 chatbot_db = None
 
 # sending text or url message to facebbok
-def callsendapi1(sender, response,page_access_token,msgtype="RESPONSE",tag="CONFIRMED_EVENT_UPDATE"):
+def callsendapi1(sender, response,page_access_token):
   
-    if msgtype=="RESPONSE":
-        payload = {
-            "recipient": {"id": sender},
-            "message": {"text": response},
-            "message_type": "RESPONSE"
-        }
-    else:
-        payload = {
-            "recipient": {"id": sender},
-            "message": {"text": response},
-            "message_type": msgtype,
-            "tag":tag
-        }
+    payload = {
+        "recipient": {"id": sender},
+        "message": {"text": response},
+        "message_type": "RESPONSE"
+    }
     headers = {"content-type": "application/json"}
     url = "https://graph.facebook.com/v15.0/me/messages?access_token={}".format(
         page_access_token)
@@ -28,36 +20,20 @@ def callsendapi1(sender, response,page_access_token,msgtype="RESPONSE",tag="CONF
 # sending  image , video message to facebbok
 
 
-def callsendapi2(sender, response,page_access_token,msgtype="RESPONSE",tag="CONFIRMED_EVENT_UPDATE"):
+def callsendapi2(sender, response,page_access_token):
 
-    if msgtype=="RESPONSE":
-        payload = {
-            "recipient": {"id": sender},
-            "message": {
-                "attachment": {
-                    "type": "image",
-                    "payload": {
-                        "url": response
-                    }
+    payload = {
+        "recipient": {"id": sender},
+        "message": {
+            "attachment": {
+                "type": "image",
+                "payload": {
+                    "url": response
                 }
-            },
-            "message_type": "RESPONSE"
-        }
-    else:
-        payload = {
-            "recipient": {"id": sender},
-            "message": {
-                "attachment": {
-                    "type": "image",
-                    "payload": {
-                        "url": response
-                    }
-                }
-            },
-            "message_type": msgtype,
-            "tag":tag
-
-        }
+            }
+        },
+        "message_type": "RESPONSE"
+    }
     headers = {"content-type": "application/json"}
     url = "https://graph.facebook.com/v15.0/me/messages?access_token={}".format(
         page_access_token)
