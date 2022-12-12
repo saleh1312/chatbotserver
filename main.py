@@ -85,9 +85,7 @@ def instaWebhook():
 def websiteWebhook():
     return "website", 200
 
-@app.route("/website", methods=['POST'])
-def websiteWebhook():
-    return "website", 200
+
 
 
 @app.route('/add_flows', methods=['POST'])
@@ -267,5 +265,5 @@ def instagramVerifyfre():
 if __name__ == "__main__":
     #app.run(port=3030, debug=True, threaded=True)
     # utils.socketio.run(app, port=5004)
-    utils.socketio.run(app, port=8080, allow_unsafe_werkzeug=True,debug=True)
-    app.run()
+    utils.socketio.run(app, port=8080,debug=True)
+    #app.run()
